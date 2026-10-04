@@ -1,0 +1,363 @@
+/* Trimmed from the Nerfies / LongProc project page styles. */
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.publication-title,
+.publication-authors,
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+.publication-authors a {
+  color: hsl(204, 86%, 53%) !important;
+}
+
+.publication-authors a:hover {
+  text-decoration: underline;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+/* Comma-free author line: equal gaps between names, centered. */
+.author-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 2.5rem;
+}
+
+.link-block a {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.fancy_text_color {
+  color: #3d7ade;
+}
+
+.container {
+  max-width: none;
+}
+
+.publication-header {
+  padding-top: 4rem;
+  padding-bottom: 1rem;
+}
+
+.no_pad_section {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+.content img {
+  display: block;
+  margin: 0 auto;
+}
+
+code {
+  font: bold 14px monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.textsc {
+  font-variant: small-caps;
+}
+
+/* TL;DR callout at the top of content.md. */
+.tldr {
+  background: #f3f7fd;
+  border-left: 4px solid #3d7ade;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  width: 80%;
+  margin: 0 auto;
+}
+/* Example viewer: board with an explanation panel on the right, the move tree
+   below both, then prev/next navigation under the board and reset under the
+   panel (all stacked on phones). The panel matches the board's height and
+   scrolls if the text is longer. */
+.chess-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "board panel"
+    "tree  tree"
+    "nav   actions";
+  column-gap: 1.5rem;
+  row-gap: 0.75rem;
+  margin: 2rem 0;
+}
+
+.chess-board {
+  grid-area: board;
+  align-self: start;
+  aspect-ratio: 1 / 1;
+}
+
+/* Board square colours, overriding chessground's brown theme (light #DCBC87,
+   dark #BB7741). The SVG draws the dark squares over the light background. */
+.chess-board cg-board {
+  background-color: #dcbc87;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23bb7741' d='M1 0h1v1h-1zM3 0h1v1h-1zM5 0h1v1h-1zM7 0h1v1h-1zM0 1h1v1h-1zM2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM1 2h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM1 4h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM0 5h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM6 5h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM0 7h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1z'/%3E%3C/svg%3E");
+}
+
+/* Coordinates outside the board: ranks down the left edge, files along the
+   bottom, each centred on its square. The board keeps its full size; the
+   labels sit in the margin to its left and in the gap above the tree. */
+.chess-board coords {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.75rem;
+  opacity: 1;
+}
+
+.chess-board coords coord {
+  color: #000 !important; /* beats the brown theme's alternating colours */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+}
+
+.chess-board coords.ranks {
+  left: -1.25rem;
+  top: 0;
+  width: 1rem;
+  height: 100%;
+}
+
+.chess-board coords.ranks coord {
+  transform: none;
+}
+
+.chess-board coords.files {
+  left: 0;
+  bottom: -1.4rem;
+  width: 100%;
+  height: 1.2rem;
+  text-transform: none;
+}
+
+.chess-panel {
+  grid-area: panel;
+  position: relative;
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+}
+
+.chess-panel-body {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+}
+
+.chess-nav {
+  grid-area: nav;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chess-count {
+  font-family: 'Google Sans', sans-serif;
+  color: #7a7a7a;
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+.chess-actions {
+  grid-area: actions;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Move tree: click a move to jump to it; the current position is underlined. */
+.chess-tree {
+  grid-area: tree;
+  margin-top: 1rem; /* room for the file labels under the board */
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  font-family: 'Google Sans', sans-serif;
+  line-height: 1.9;
+}
+
+.chess-tree-move {
+  cursor: pointer;
+  margin-right: 0.5em;
+  text-underline-offset: 3px;
+}
+
+.chess-tree-move.is-current {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* Move links and summary lines in the panel text (see board.js). */
+.chess-move {
+  border-radius: 3px;
+  padding: 0 0.15em;
+}
+
+.chess-move:hover {
+  background: #e8f0fc;
+}
+
+/* Brief highlight on the link a tree click scrolled to. */
+.chess-move.is-flashing {
+  animation: chess-flash 1.2s ease-out;
+}
+
+@keyframes chess-flash {
+  from { background: #c8efd4; }
+  to { background: transparent; }
+}
+
+.chess-move.is-clickable {
+  cursor: pointer;
+}
+
+.chess-move.is-invalid {
+  color: inherit;
+  cursor: default;
+  text-decoration: line-through;
+}
+
+@media screen and (max-width: 768px) {
+  .chess-demo {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "board" "nav" "panel" "tree" "actions";
+  }
+
+  .chess-panel-body {
+    position: static;
+  }
+}
+
+/* Figures side by side under the text, each 40% of the column and centred;
+   stacked full width on phones. Wrap the <figure>s in <div class="figure-row">.
+   The row is a two-row grid (images, then captions) that each figure joins
+   through subgrid: images sit at the bottom of the image row and captions at
+   the top of the caption row, so the captions line up even when the images
+   differ in height. */
+.figure-row {
+  display: grid;
+  grid-template-columns: repeat(2, 40%);
+  justify-content: center;
+  column-gap: 1.5rem;
+  row-gap: 0;
+  margin: 1.5rem 0;
+}
+
+#content .content .figure-row figure {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  margin: 0;
+  scroll-margin-top: 1.5rem; /* for "Figure N" links */
+}
+
+#content .figure-row figure > a {
+  align-self: end;
+}
+
+#content .figure-row img {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+}
+
+#content .figure-row figcaption {
+  align-self: start;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #7a7a7a;
+  text-align: left;
+}
+
+@media screen and (max-width: 768px) {
+  .figure-row {
+    grid-template-columns: 100%;
+    row-gap: 1.5rem;
+  }
+}
+
+/* Tighter spacing between content.md sections (Bulma's default is 3rem
+   above and below each, so 6rem between sections). */
+#content > .section {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+#content h2.title,
+#content h3.title {
+  scroll-margin-top: 1.5rem;
+}
+
+/* ### subsections: centred like section titles, one size smaller (is-4). */
+#content h3.title {
+  text-align: center;
+}
+
+/* Sidebar table of contents: fixed in the left margin on wide screens only. */
+.toc {
+  display: none;
+}
+
+@media screen and (min-width: 1216px) {
+  .toc {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 1.5rem;
+    transform: translateY(-50%);
+    width: 180px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 0.95rem;
+  }
+}
+
+.toc-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #363636;
+}
+
+.toc a {
+  display: block;
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  border-left: 2px solid #dbdbdb;
+  color: #7a7a7a;
+}
+
+.toc a:hover {
+  color: #3d7ade;
+}
+
+/* Subsection entries, indented under their section. */
+.toc li.toc-sub a {
+  padding-left: 1.75rem;
+  font-size: 0.85rem;
+}
+
+.toc a.is-active {
+  border-left-color: #3d7ade;
+  color: #3d7ade;
+  font-weight: bold;
+}

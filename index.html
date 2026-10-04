@@ -1,24 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Queen Page</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="description" content="Queen: a 4B-parameter chess-language model that plays at Grandmaster level and explains its moves.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChessLM</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessground@9.2.1/assets/chessground.base.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessground@9.2.1/assets/chessground.brown.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessground@9.2.1/assets/chessground.cburnett.css">
+  <link rel="stylesheet" href="./static/css/index.css">
 </head>
 <body>
-  <header>
-    <h1>Queen Page</h1>
-  </header>
 
-  <main>
-    <p>Hello, world!</p>
-  </main>
+<!-- Title, authors, links. Edit here; everything below the header lives in content.md. -->
+<section class="section publication-header">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column has-text-centered is-four-fifths">
+        <h2 class="subtitle is-3 publication-subtitle">
+          <span>Language Models that Play Chess and Explain their Moves</span>
+        </h2>
 
-  <footer>
-    <p>&copy; 2026</p>
-  </footer>
+        <!-- TODO: author homepage links -->
+        <div class="is-size-5 publication-authors author-list">
+          <span class="author-block">
+            <a href="https://adithyabh.github.io/"><span class="fancy_text_color">Adithya Bhaskar</span></a><sup>*</sup>
+          </span>
+          <span class="author-block">
+            <a href="https://nexync.github.io/"><span class="fancy_text_color">Jeffrey Cheng</span></a><sup>*</sup>
+          </span>
+          <span class="author-block">
+            <a href="https://www.cs.princeton.edu/~danqic/"><span class="fancy_text_color">Danqi Chen</span></a>
+          </span>
+        </div>
+        <div class="is-size-5 publication-authors">
+          <span class="author-block">Princeton Language and Intelligence, Princeton University</span><br>
+          <span class="author-block is-size-6"><sup>*</sup>Equal contribution</span>
+        </div>
 
-  <script src="script.js"></script>
+        <div class="column has-text-centered">
+          <div class="publication-links">
+            <!-- TODO: arXiv link -->
+            <span class="link-block">
+              <a href="#" class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="ai ai-arxiv"></i></span>
+                <span>Paper</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="https://huggingface.co/collections/princeton-nlp/queen-chess-models" class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">🤗</span>
+                <span>Models</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="https://github.com/queen-project/queen" class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="fab fa-github"></i></span>
+                <span>Code</span>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Rendered from content.md: each "## Heading" becomes its own section and a sidebar entry. -->
+<nav id="toc" class="toc" aria-label="Contents"></nav>
+<main id="content"></main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>Page template adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="./static/js/render.js"></script>
+<script type="module" src="./static/js/board.js"></script>
 </body>
 </html>
