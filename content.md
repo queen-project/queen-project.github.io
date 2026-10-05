@@ -26,7 +26,7 @@ Furthermore, LM-based evaluations show that our explanations are fluent and appr
 If you've ever used a chess website such as
 <a href="https://chess.com/" target="_blank" rel="noopener noreferrer">chess.com</a> or <a href="https://lichess.org" target="_blank" rel="noopener noreferrer">Lichess</a>, chances are you've used a chess engine like Stockfish. Engines suggest a best move and give an evaluation of the position, but their verdicts can be hard to make sense of (<a href="#fig-stockfish">Figure 1</a>). Chess engines are an example of what we call *silent experts*: systems (often neural networks) that are experts in taking actions in a specialized domain (i.e. [AlphaZero](https://en.wikipedia.org/wiki/AlphaZero) in Go or [AlphaFold](https://en.wikipedia.org/wiki/AlphaFold) in protein folding) but that cannot provide reasoning or explanations for their actions.
 
-Frontier models have recently seen drastic improvements in their chess expertise, but are by no means perfect (<a href="#fig-frontier-lm">Figure 2</a>). We introduce \textsc{Queen} (**Qu**ality **E**xplanation and **E**valuation **N**etwork), a 4B-parameter chess-language model that plays at the level approaching a typical Grandmaster (Lichess Blitz Elo) and explains its moves in plain language. To see it in action, try the [demo below](#demo). To learn how we built it, read our [high-level overview](#queen-our-method) or [technical paper](#).
+Frontier models have recently seen drastic improvements in their chess expertise, but are by no means perfect (<a href="#fig-frontier-lm">Figure 2</a>). We introduce \textsc{Queen} (**Qu**ality **E**xplanation and **E**valuation **N**etwork), a 4B-parameter chess-language model that plays at the level approaching a typical Grandmaster (Lichess Blitz Elo) and explains its moves in plain language. To see it in action, try the [demo below](#demo). To learn how we built it, read our [high-level overview](#queen-our-method) or [technical paper](https://arxiv.org/abs/2610.03695).
 
 <div class="figure-row">
 <figure id="fig-stockfish">
@@ -176,7 +176,7 @@ We run seven iterations of training, with \textsc{Pawn}-8 promoted to the name *
 
 ## Evaluations
 
- A high-quality explanation must be grounded in strong predictions to be helpful. Thus, it is important for our model to be able to play chess at a high level. We report our Elo playing strength evaluations here. Playing full games simulates real-world human-model interactions and offers greater robustness compared to scoring singlular moves on a fixed test set.  See the [technical paper](#) for our other evaluations.
+ A high-quality explanation must be grounded in strong predictions to be helpful. Thus, it is important for our model to be able to play chess at a high level. We report our Elo playing strength evaluations here. Playing full games simulates real-world human-model interactions and offers greater robustness compared to scoring singlular moves on a fixed test set.  See the [technical paper](https://arxiv.org/abs/2610.03695) for our other evaluations.
 
 <figure class="elo-chart" id="fig-elo"></figure>
 
