@@ -41,7 +41,8 @@ Frontier models have recently seen drastic improvements in their chess expertise
 
 ## Demo
 
-<!-- Examples live in static/examples/; index.json sets their order. -->
+The positions on the left are passed to \textsc{Queen}, which produces the outputs on the right. The output is the result of a single forward pass; positions that \textsc{Queen} reaches in its explanations are not re-encoded.
+
 <div class="chess-demo" data-examples="static/examples/index.json"></div>
 
 ## \textsc{Queen}: Our Method

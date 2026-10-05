@@ -149,6 +149,8 @@ const renderText = (md) => marked.parse(markSummary(md)
 const setup = async (root) => {
   // Build the layout before fetching so the board's space is reserved immediately.
   root.innerHTML =
+    '<div class="chess-label chess-label-board">Encoded Position</div>' +
+    '<div class="chess-label chess-label-panel"><span class="textsc">Queen</span> Output</div>' +
     '<div class="chess-board"></div>' +
     '<div class="chess-panel"><div class="chess-panel-body"></div></div>' +
     '<div class="chess-tree"></div>' +

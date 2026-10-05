@@ -92,9 +92,10 @@ html {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-areas:
-    "board panel"
-    "tree  tree"
-    "nav   actions";
+    "blabel plabel"
+    "board  panel"
+    "tree   tree"
+    "nav    actions";
   column-gap: 1.5rem;
   row-gap: 0.75rem;
   margin: 2rem 0;
@@ -105,6 +106,17 @@ html {
   align-self: start;
   aspect-ratio: 1 / 1;
 }
+
+/* Column headings above the board and the text panel. */
+.chess-label {
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 600;
+  color: #363636;
+  text-align: center;
+}
+
+.chess-label-board { grid-area: blabel; }
+.chess-label-panel { grid-area: plabel; }
 
 /* Board square colours, overriding chessground's brown theme (light #DCBC87,
    dark #BB7741). The SVG draws the dark squares over the light background. */
@@ -240,7 +252,7 @@ html {
 @media screen and (max-width: 768px) {
   .chess-demo {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "board" "nav" "panel" "tree" "actions";
+    grid-template-areas: "blabel" "board" "nav" "plabel" "panel" "tree" "actions";
   }
 
   .chess-panel-body {
