@@ -76,7 +76,7 @@ Unlike the original Flamingo architecture where only the last encoder hidden sta
 
 ### Domain Adaptation: Interpreting Encoder Representations
 
-With the architecture in place, we are now ready to start training. Before we train the whole model to produce explainations, we want to first train the newly added cross attention layers (470 parameters). This domain adapation stage will let the decoder reliably extract features encoded in Leela's representations, and we find that it is crucial to the final model's performance. We performn this domain adaptation training with a curated question-answering curriculum, described below.
+With the architecture in place, we are now ready to start training. Before we train the whole model to produce explainations, we want to first train the newly added cross attention layers (470 parameters). This domain adapation stage will let the decoder reliably extract features encoded in Leela's representations, and we find that it is crucial to the final model's performance. We perform this domain adaptation training with a curated question-answering curriculum, described below.
 
 <figure class="method-fig" id="fig-curriculum">
 <img src="static/images/domain-adaptation.svg" alt="Two chessboards beside four example curriculum questions with answers: static and dynamic questions, each about the current position and about a future position.">
