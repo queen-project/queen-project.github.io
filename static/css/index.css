@@ -298,6 +298,251 @@ html {
   }
 }
 
+/* Full-width method figures (Architecture, Domain Adaptation, Search). */
+#content .content figure.method-fig {
+  margin: 1rem 0 1.5rem;
+  scroll-margin-top: 1.5rem;
+}
+
+#content .method-fig img {
+  display: block;
+  width: 100%;
+}
+
+/* Paragraphs side by side: wrap each in a <div> inside <div class="para-row">
+   (leave blank lines around the Markdown). Stacked on phones. */
+.para-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1.5rem;
+  margin-bottom: 1em;
+}
+
+@media screen and (max-width: 768px) {
+  .para-row {
+    grid-template-columns: 1fr;
+    row-gap: 1em;
+  }
+}
+
+/* 2x2 grid of cards (domain-adaptation question types): columns Static /
+   Dynamic, rows Current / Future. One column on phones. The gaps leave room
+   for the training-order arrows that flow.js draws in an SVG over the grid. */
+.qa-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2.5rem;
+  row-gap: 2.25rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.qa-card {
+  background: #f5f7fb;
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+#content .qa-card p:first-child {
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+/* Five-step cycle (iterative search distillation), as a pentagon:
+          Sample
+   Train         Generate
+   Consolidate   Recurse
+   with the Pawn-k -> Pawn-(k+1) label in the middle. flow.js draws the arrows
+   clockwise, Train back to Sample. Stacked (no closing arrow) on phones. */
+/* 24 narrow columns with no gap, so card widths and positions can be set
+   finely; the spans below leave the spacing. Mirror-symmetric about the
+   centre: Train/Generate 8 columns at the edges, Sample 10 centred,
+   Consolidate/Recurse 9, pulled in with a 2-column gap for the arrow. */
+.cycle-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  column-gap: 0;
+  row-gap: 3rem;
+  align-items: center;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.cycle-card {
+  background: #f5f7fb;
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+  text-align: left; /* justified text leaves big gaps in these narrow cards */
+}
+
+#content .cycle-card p:first-child {
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+#si-sample      { grid-column: 8 / 18;  grid-row: 1; }
+#si-generate    { grid-column: 17 / 25; grid-row: 2; }
+#si-recurse     { grid-column: 14 / 23; grid-row: 3; }
+#si-consolidate { grid-column: 3 / 12;  grid-row: 3; }
+#si-train       { grid-column: 1 / 9;   grid-row: 2; }
+
+.cycle-center {
+  grid-column: 9 / 17;
+  grid-row: 2;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 1.05rem;
+}
+
+#content .cycle-center p {
+  text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+  .cycle-grid {
+    grid-template-columns: 1fr;
+    row-gap: 1.75rem;
+  }
+
+  #si-sample, #si-generate, #si-recurse, #si-consolidate, #si-train, .cycle-center {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+.flow-arrows {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 768px) {
+  .qa-grid {
+    grid-template-columns: 1fr;
+    row-gap: 1.75rem;
+  }
+}
+
+/* Elo chart (Evaluations), drawn by elo-chart.js: legend row, the SVG plot
+   with a hover/focus tooltip, a "Show data" table, then the caption. */
+#content .content figure.elo-chart {
+  margin: 1rem 0 1.5rem;
+  scroll-margin-top: 1.5rem;
+  text-align: left;
+}
+
+.elo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  font-size: 0.85rem;
+  color: #52514e;
+  margin-bottom: 0.25rem;
+}
+
+.elo-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.elo-plot {
+  position: relative;
+}
+
+.elo-plot svg {
+  display: block;
+  font-family: 'Google Sans', 'Noto Sans', sans-serif;
+}
+
+.elo-plot svg:focus {
+  outline: none;
+}
+
+.elo-plot svg:focus-visible {
+  outline: 2px solid #2a78d6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.elo-tick {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.elo-label {
+  font-size: 13px;
+}
+
+.elo-axis-title {
+  font-size: 13px;
+}
+
+.elo-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: #ffffff;
+  border: 1px solid rgba(11, 11, 11, 0.10);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(11, 11, 11, 0.08);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.elo-tooltip-title {
+  color: #52514e;
+  margin-bottom: 0.15rem;
+}
+
+.elo-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.elo-tooltip-row strong {
+  color: #0b0b0b;
+  font-variant-numeric: tabular-nums;
+}
+
+.elo-tooltip-row span {
+  color: #52514e;
+}
+
+.elo-table {
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.elo-table summary {
+  cursor: pointer;
+  color: #52514e;
+}
+
+#content .elo-table table {
+  width: auto;
+  margin: 0.5rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+#content .elo-table td,
+#content .elo-table th {
+  padding: 0.2rem 1rem 0.2rem 0;
+  border-color: #e1e0d9;
+}
+
+#content figure.elo-chart figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #7a7a7a;
+  font-style: normal;
+}
+
 /* Tighter spacing between content.md sections (Bulma's default is 3rem
    above and below each, so 6rem between sections). */
 #content > .section {

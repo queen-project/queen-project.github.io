@@ -24,9 +24,9 @@ Furthermore, LM-based evaluations show that our explanations are fluent and appr
 ## Motivation
 
 If you've ever used a chess website such as
-<a href="https://chess.com/" target="_blank" rel="noopener noreferrer">chess.com</a> or <a href="https://lichess.org" target="_blank" rel="noopener noreferrer">Lichess</a>, chances are you've used a chess engine like Stockfish. Engines suggest a best move and give an evaluation of the position, but their verdicts can be hard to make sense of (<a href="#fig-stockfish">Figure 1</a>). Chess engines are an example of what we call *silent experts*: systems (often neural networks) that are experts in taking actions in a specialized domain (i.e. AlphaZero in Go or AlphaFold in protein folding) but that cannot provide reasoning or explanations for their actions.
+<a href="https://chess.com/" target="_blank" rel="noopener noreferrer">chess.com</a> or <a href="https://lichess.org" target="_blank" rel="noopener noreferrer">Lichess</a>, chances are you've used a chess engine like Stockfish. Engines suggest a best move and give an evaluation of the position, but their verdicts can be hard to make sense of (<a href="#fig-stockfish">Figure 1</a>). Chess engines are an example of what we call *silent experts*: systems (often neural networks) that are experts in taking actions in a specialized domain (i.e. [AlphaZero](https://en.wikipedia.org/wiki/AlphaZero) in Go or [AlphaFold](https://en.wikipedia.org/wiki/AlphaFold) in protein folding) but that cannot provide reasoning or explanations for their actions.
 
-Frontier models have recently seen drastic improvements in their chess expertise, but are by no means perfect (<a href="#fig-frontier-lm">Figure 2</a>). We introduce \textsc{Queen}, a 4B-parameter chess-language model that plays at the level approaching a typical Grandmaster (Lichess Blitz Elo) and explains its moves in plain language. To see it in action, try the [demo below](#demo). To learn how we built it, read our [high-level overview](#queen-our-method) or [technical paper](#).<!-- TODO: replace "#" with the arXiv URL once it's up (same URL as the Paper button in index.html). -->
+Frontier models have recently seen drastic improvements in their chess expertise, but are by no means perfect (<a href="#fig-frontier-lm">Figure 2</a>). We introduce \textsc{Queen} (**Qu**ality **E**xplanation and **E**valuation **N**etwork), a 4B-parameter chess-language model that plays at the level approaching a typical Grandmaster (Lichess Blitz Elo) and explains its moves in plain language. To see it in action, try the [demo below](#demo). To learn how we built it, read our [high-level overview](#queen-our-method) or [technical paper](#).
 
 <div class="figure-row">
 <figure id="fig-stockfish">
@@ -46,41 +46,137 @@ Frontier models have recently seen drastic improvements in their chess expertise
 
 ## \textsc{Queen}: Our Method
 
-<!--
-Scope: how Queen is built, in the order of the pipeline. Each subsection's
-draft paragraph only restates the Introduction; replace it with the real
-explanation. TODO comments list what still needs to go in.
--->
-
 ### Architecture
 
-<!--
-TODO:
-- Architecture figure (static/images/architecture.png): chess encoder -> cross-attention -> LM decoder.
-- Which chess encoder and which instruction-tuned LM, and how the 4B parameters split between them.
-- What the encoder outputs and how the LM reads it through cross-attention.
--->
+Our approach begins with an encoder-decoder architecture: the encoder is a strong Transformer-based chess engine and the decoder is a standard language model. Intuitively, the encoder processes an inputted position and encodes features (i.e. board state, legal moves, tactical motifs) within its hidden states. The decoder is then able to extract this latent information through cross attention. 
 
-\textsc{Queen} is an encoder-decoder model. A silent expert chess encoder reads the position, and an instruction-tuned language model attends to the encoder's representations through cross-attention, so the language model can talk about what the encoder knows.
+<figure class="method-fig" id="fig-architecture">
+<img src="static/images/architecture.svg" alt="Queen architecture: hidden states from layer k of the frozen Lc0 chess encoder feed a Flamingo (gated cross-attention) block before layer 2k of the SmolLM3-3B decoder, which reads the prompt and writes the explanation.">
+</figure>
 
-### Domain Adaptation
+<div class="para-row">
+<div id="arch-encoder">
 
-<!--
-TODO:
-- What the question-answering curriculum covers and how it is staged.
-- One or two example questions with the model's answers.
-- How much of the model is trained at this stage (e.g. which parts are frozen).
--->
+**Chess Encoder.** We use the BT5 network from the Leela Chess Zero (Lc0) family. It is a 240M parameter encoder-only model consisting of 15 layers with a hidden dimension of 1024. It always operates on a sequence length of 64 tokens, each corresponding to a square on the chessboard, and plays at a near-superhuman level without search.
 
-Before it can explain anything, the language model has to learn to read the encoder. We train it with a question-answering curriculum that teaches it to extract chess concepts from the encoder's representations.
+</div>
+<div id="arch-decoder">
+
+**Language Model Decoder.** We use SmolLM3-3B model as our LM decoder. SmolLM3 is instruction tuned, but is a general-purpose language model with little to no chess-specific training. It has 36 layers with a hidden dimension of 2048. The model is trained without the thinking mode activated.
+
+</div>
+</div>
+
+**Bridge Architecture.** Encoder-decoder architectures that pair domain-specific encoders with decoder LMs have been explored through vision-language models. Prior approaches introduce mechanisms to project the visual encoder features into representations that can be processed by the decoder. We take inspiration from one such approach, Flamingo, which connects the encoder and decoder with cross-attention. Let *e<sub>i</sub>* and *d<sub>i</sub>* denote the output of the *i*-th encoder and decoder layers, respectively.
+We insert gated cross-attention layers operating on a pair *(e<sub>i</sub>, d<sub>j</sub>)* between the usual LM decoder layers, where key and value projections come from *e<sub>i</sub>* and query projections come from *d<sub>j</sub>*.
+Unlike the original Flamingo architecture where only the last encoder hidden state is used, we pair each *e<sub>i</sub>* with *d<sub>2i</sub>*, and insert the corresponding gated cross-attention layer prior to the *2i*-th decoder block. This choice allows the decoder to access representations from earlier layers of the encoder, rather than relying on its final hidden state.
+
+**Full Model Flow.** Inputs to the model are a pair of ([FEN](https://en.wikipedia.org/wiki/Forsyth-Edwards_Notation), text). The FEN string is processed by Leela to produce a sequence of encoder hidden states, which are provided as context to the SmolLM decoder through the gated cross-attention layers. Thus, the decoder can condition on the chess position at every position in the text sequence while autoregressively generating the output.
+
+### Domain Adaptation: Interpreting Encoder Representations
+
+With the architecture in place, we are now ready to start training. Before we train the whole model to produce explainations, we want to first train the newly added cross attention layers (470 parameters). This domain adapation stage will let the decoder reliably extract features encoded in Leela's representations, and we find that it is crucial to the final model's performance. We performn this domain adaptation training with a curated question-answering curriculum, described below.
+
+<figure class="method-fig" id="fig-curriculum">
+<img src="static/images/domain-adaptation.svg" alt="Two chessboards beside four example curriculum questions with answers: static and dynamic questions, each about the current position and about a future position.">
+</figure>
+
+We source all our positions from the Lichess [database](https://database.lichess.org/). Each example in our QA curriculum consists of a position *p*, represented by its FEN, and a query *q*. Every *q* either is asked about the current position *p* or a future position *p′* reached by a provided sequence of 1 to 8 moves. These  queries fall into four categories:
+
+<div class="qa-grid">
+<div class="qa-card" id="qa-static-current">
+
+**\textsc{Static-Current}**
+
+These questions teach the model to recover basic board-state information from Leela's representation of the current position, such as identifying the piece on a queried square, finding the location of a queried piece, or listing all pieces.
+
+</div>
+<div class="qa-card" id="qa-dynamic-current">
+
+**\textsc{Dynamic-Current}**
+
+These questions teach the model to extract rules about how pieces move and interact in the current position, such as finding all possible legal moves for a queried piece or listing all possible captures and checks.
+
+</div>
+<div class="qa-card" id="qa-static-future">
+
+**\textsc{Static-Future}**
+
+These questions require the model to first reconstruct the position resulting from a supplied sequence of moves and then answer a static query about the resulting board, such as identifying pieces on particular squares or ranks.
+
+</div>
+<div class="qa-card" id="qa-dynamic-future">
+
+**\textsc{Dynamic-Future}**
+
+These questions combine future-state reconstruction with reasoning about the resulting position, such as finding legal moves, captures, checks, or attackers after a supplied sequence of moves.
+
+</div>
+</div>
+
+We construct a separate dataset for each question type and perform domain adaptation sequentially, progressing from \textsc{Static-Current} → \textsc{Dynamic-Current} → \textsc{Static-Future} → \textsc{Dynamic-Future}. This progression teaches the model to first extract all features of the encoded board state. The future-position stages introduce an additional state-tracking challenge: the model must first reconstruct the board state resulting from the provided move sequence before answering the query. In all stages, the encoder and decoder are both frozen, only the cross-attention bridge parameters and new token embeddings are trained. All stages use early stopping based on the validation set, and the best checkpoint from each stage is used as the initialization for the next.
+We denote the model checkpoint obtained after this training as \textsc{Pawn} (**P**osition **Aw**are **N**etwork). 
 
 ### Iterative Search Distillation
 
-<!--
-TODO:
-- Diagram of one iteration: candidate moves -> analyze each resulting position -> consolidate -> distill.
-- Plot of Elo per iteration (1782 at the start, 2697 after seven iterations).
-- How candidate moves are chosen and how the consolidated explanations are filtered.
--->
+\textsc{Pawn} can now answer questions about the current position but has not seen examples of our desired explanation format. We thus seed the model with examples of this form generated by GPT-5.6-Sol (low effort). We filter out any GPT generated explanations containing hallucinations or mistakes and perform SFT on the remaining set, yielding \textsc{Pawn}-1.
 
-Starting from the domain-adapted model, we improve its explanations with a natural-language analog of the Bellman update. The model analyzes the positions after its top candidate moves and consolidates those analyses into an explanation of the current position, which is then distilled back into the model. Over seven iterations, playing strength rises from 1782 to 2697 Elo.
+<figure class="method-fig" id="fig-search">
+<img src="static/images/iterative-search.svg" alt="One search iteration: the model analyzes the positions after three candidate moves and consolidates them into an explanation of the current position, taking the minimum evaluation.">
+</figure>
+
+Though fluent, \textsc{Pawn}-1's explanations recommend low-quality and illegal moves, likely due to the limited strength of the teacher and the small size of the seed dataset. To improve the quality of its explanations, we look to AlphaZero for inspiration: its paradigm repeatedly uses [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search) (MCTS) to produce improved evaluations, which are distilled into the network so that it can reproduce them without search.
+Replacing MCTS with alpha-beta search gives a simplified form of [Bellman value iteration](https://en.wikipedia.org/wiki/Bellman_equation#The_Bellman_equation). We extend this idea to natural language, proposing an analogue of the Bellman update where improved explanations are distilled back to the model (See above figure). In practice, we apply the below process to train \textsc{Pawn}-*(k+1)* from \textsc{Pawn}-*k*.
+
+<div class="cycle-grid">
+<div class="cycle-card" id="si-sample">
+
+**\textsc{Sample}**
+
+We sample a pool of roughly 400K root positions from self-play games, general human play, and puzzles.
+
+</div>
+<div class="cycle-card" id="si-generate">
+
+**\textsc{Generate}**
+
+For each root position *p*, \textsc{Pawn}-*k* generates an explanation containing three promising moves. We ensure at least one good move exists, then \textsc{Pawn}-*k* independently generates explanations of the three resulting positions.
+
+</div>
+<div class="cycle-card" id="si-recurse">
+
+**\textsc{Recurse}**
+
+We inspect the best-move prediction of each child. If any child predicts a mistake, we discard the current root and repeat the prior step from the selected child, recursing until the next-move predictions of all three child explanations are mistake-free.
+
+</div>
+<div class="cycle-card" id="si-consolidate">
+
+**\textsc{Consolidate}**
+
+We combine the three child explanations using Qwen3.8-27B (instructed not to introduce any new content) to produce a consolidated explanation of the root position.
+
+</div>
+<div class="cycle-card" id="si-train">
+
+**\textsc{Train}**
+
+We filter out examples where the consildated PV is worse than the original. The remaining explanations form fine-tuning data for \textsc{Pawn}-*(k+1)*, which we obtain by SFT from \textsc{Pawn}-*k*.
+
+</div>
+<div class="cycle-center">
+
+\textsc{Pawn}-*k* → \textsc{Pawn}-*(k+1)*
+
+</div>
+</div>
+
+We run seven iterations of training, with \textsc{Pawn}-8 promoted to the name **\textsc{Queen}**.
+
+## Evaluations
+
+ A high-quality explanation must be grounded in strong predictions to be helpful. Thus, it is important for our model to be able to play chess at a high level. We report our Elo playing strength evaluations here. See the [technical paper](#) for our other evaluations.
+
+<figure class="elo-chart" id="fig-elo"></figure>
+
+We evaluate \textsc{Queen} alongside three frontier models, Gemini, GPT-5.6-Sol, and GPT-5.6-Luna, all run with high reasoning effort, as well as the C1-4B baseline. Each model plays 32 full games against a fixed set of 8 chess engines of varying strength, and we turn the results into an Elo rating anchored to the Lichess scale. Playing full games, rather than scoring single moves on a fixed test set, is closer to how people actually use a chess assistant and gives a more robust measure. C1-4B lost all 32 of its games (an estimated 514 Elo), so it is left off the chart.
