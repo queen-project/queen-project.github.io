@@ -175,8 +175,8 @@ We run seven iterations of training, with \textsc{Pawn}-8 promoted to the name *
 
 ## Evaluations
 
- A high-quality explanation must be grounded in strong predictions to be helpful. Thus, it is important for our model to be able to play chess at a high level. We report our Elo playing strength evaluations here. See the [technical paper](#) for our other evaluations.
+ A high-quality explanation must be grounded in strong predictions to be helpful. Thus, it is important for our model to be able to play chess at a high level. We report our Elo playing strength evaluations here. Playing full games simulates real-world human-model interactions and offers greater robustness compared to scoring singlular moves on a fixed test set.  See the [technical paper](#) for our other evaluations.
 
 <figure class="elo-chart" id="fig-elo"></figure>
 
-We evaluate \textsc{Queen} alongside three frontier models, Gemini, GPT-5.6-Sol, and GPT-5.6-Luna, all run with high reasoning effort, as well as the C1-4B baseline. Each model plays 32 full games against a fixed set of 8 chess engines of varying strength, and we turn the results into an Elo rating anchored to the Lichess scale. Playing full games, rather than scoring single moves on a fixed test set, is closer to how people actually use a chess assistant and gives a more robust measure. C1-4B lost all 32 of its games (an estimated 514 Elo), so it is left off the chart.
+We evaluate \textsc{Queen} alongside three frontier models, Gemini, GPT-5.6-Sol, and GPT-5.6-Luna, all run with high reasoning effort. Each model plays 32 full games against a fixed set of 8 chess engines of varying strength, and we anchor the results into an Elo rating anchored to the Lichess blitz rating scale. C1-4B, prior work at a parameter matched regime, lost all 32 of its games (an estimated 514 Elo), so it is left off the chart.
